@@ -1,9 +1,10 @@
-import { useRouter } from "next/router";
-import { Layout } from "../../components/layouts"
+import { useState } from "react";
 import { NextPage, GetStaticProps, GetStaticPaths } from 'next';
-import { pokeApi } from "../../api";
-import { Pokemon } from "../../interfaces";
 import { Grid, Card, Text, Button, Container, Image } from "@nextui-org/react";
+import { Layout } from "../../components/layouts"
+import { Pokemon } from "../../interfaces";
+import { localFavorites } from "../../utils";
+import { pokeApi } from "../../api";
 
 
 interface Props {
@@ -12,10 +13,20 @@ interface Props {
 
 const PokemonPage: NextPage<Props> = ({ pokemon }) => {
 
+  const [isInFavorites, setIsInFavorites] = useState( localFavorites.existFavorites( pokemon.id ) ); 
+  console.log(isInFavorites);
+
+
+  const onToggleFavorite = () => {
+    localFavorites.toggleFavorite(pokemon.id);
+    setIsInFavorites(!isInFavorites);
+  }
+
+
 
 
   return (
-    <Layout title="Algun Pokemon">
+    <Layout title={pokemon.name}>
 
       <Grid.Container css={{ marginTop: '5px' }} gap={2}>
         <Grid xs={12} sm={4}>
@@ -38,11 +49,16 @@ const PokemonPage: NextPage<Props> = ({ pokemon }) => {
               <Text h1 transform="capitalize">{pokemon.name}</Text>
 
               <Button
-                color="gradient"
-                ghost
+              color="gradient"
+              ghost={ !isInFavorites }
+              // shadow
+              onClick={onToggleFavorite}
               >
-                Guardar en Favorito
+                { (isInFavorites) ? 'En Favoritos' : 'Guardar en Favorito'
+                }
+                
               </Button>
+
             </Card.Header>
 
             <Card.Body>
@@ -89,7 +105,7 @@ const PokemonPage: NextPage<Props> = ({ pokemon }) => {
 
 export const getStaticPaths: GetStaticPaths = async (ctx) => {
 
-  const pokemons151 = [...Array(648)].map((value, index) => `${index + 1}`);
+  const pokemons151 = [...Array(151)].map((value, index) => `${index + 1}`);
 
 
   return {

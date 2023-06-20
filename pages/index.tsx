@@ -4,7 +4,7 @@ import { Layout } from '../components/layouts'
 import { pokeApi } from '../api';
 import { PokemonListResponse, SmallPokemon } from '../interfaces';
 import { Grid } from '@nextui-org/react';
-import { PokemonCard } from '../pokemon';
+import { PokemonCard } from '../components/pokemon';
 
 interface Porps {
   pokemons: SmallPokemon[];
@@ -40,7 +40,7 @@ const HomePage: NextPage<Porps> = ({ pokemons }) => {
 //* Solo se Ejecuta en el lado del Servidor
 export const getStaticProps: GetStaticProps = async (ctx) => {
 
-  const { data } = await pokeApi.get<PokemonListResponse>('/pokemon/?limit=648'); // 648 386 151
+  const { data } = await pokeApi.get<PokemonListResponse>('/pokemon/?limit=151'); // 648 386 151
 
   // console.log(data);
   const pokemons: SmallPokemon[] = data.results.map((poke, i) => ({
