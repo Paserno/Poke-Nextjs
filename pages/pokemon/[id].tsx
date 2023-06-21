@@ -18,26 +18,26 @@ interface Props {
 
 const PokemonPage: NextPage<Props> = ({ pokemon }) => {
 
-  const [isInFavorites, setIsInFavorites] = useState( localFavorites.existFavorites( pokemon.id ) ); 
+  const [isInFavorites, setIsInFavorites] = useState(localFavorites.existFavorites(pokemon.id));
 
 
   const onToggleFavorite = () => {
     localFavorites.toggleFavorite(pokemon.id);
     setIsInFavorites(!isInFavorites);
 
-    if ( isInFavorites ) return;
+    if (isInFavorites) return;
 
-      confetti({
-        zIndex: 99,
-        particleCount: 150,
-        spread: 160,
-        angle: -100,
-        origin: {
-          x: 1,
-          y: 0,
-        }
-      })
-    
+    confetti({
+      zIndex: 99,
+      particleCount: 150,
+      spread: 160,
+      angle: -100,
+      origin: {
+        x: 1,
+        y: 0,
+      }
+    })
+
   }
 
 
@@ -67,14 +67,14 @@ const PokemonPage: NextPage<Props> = ({ pokemon }) => {
               <Text h1 transform="capitalize">{pokemon.name}</Text>
 
               <Button
-              color="gradient"
-              ghost={ !isInFavorites }
-              // shadow
-              onClick={onToggleFavorite}
+                color="gradient"
+                ghost={!isInFavorites}
+                // shadow
+                onClick={onToggleFavorite}
               >
-                { (isInFavorites) ? 'En Favoritos' : 'Guardar en Favorito'
+                {(isInFavorites) ? 'En Favoritos' : 'Guardar en Favorito'
                 }
-                
+
               </Button>
 
             </Card.Header>
@@ -83,25 +83,25 @@ const PokemonPage: NextPage<Props> = ({ pokemon }) => {
               <Text size={30}>Sprites: </Text>
 
               <Container direction="row" display="flex">
-                <Image 
+                <Image
                   src={pokemon.sprites.front_default}
                   alt={pokemon.name}
                   width={100}
                   height={100}
                 />
-                <Image 
+                <Image
                   src={pokemon.sprites.back_default}
                   alt={pokemon.name}
                   width={100}
                   height={100}
                 />
-                <Image 
+                <Image
                   src={pokemon.sprites.front_shiny}
                   alt={pokemon.name}
                   width={100}
                   height={100}
                 />
-                <Image 
+                <Image
                   src={pokemon.sprites.back_shiny}
                   alt={pokemon.name}
                   width={100}
@@ -131,7 +131,8 @@ export const getStaticPaths: GetStaticPaths = async (ctx) => {
       params: { id }
     })),
 
-    fallback: false
+    // fallback: false
+    fallback: "blocking"
   }
 }
 
@@ -140,13 +141,22 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   const { id } = params as { id: string };
 
+  const pokemon = await getPokemonInfo(id)
 
-
+  if (!pokemon) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      }
+    }
+  }
 
   return {
     props: {
-      pokemon: await getPokemonInfo(id)
-    }
+      pokemon
+    },
+    revalidate: 86400, // 60 * 60 * 24 tiempo de generacion de paginas
   }
 }
 
